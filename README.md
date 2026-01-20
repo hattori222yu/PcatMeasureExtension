@@ -21,7 +21,7 @@ based on coronary centerlines.
 
 1. Clone this repository:
    ```bash
-   git clone https://github.com/masayama222/PcatMeasureExtension.git
+   git clone https://github.com/hattori222yu/PcatMeasureExtension.git
 2.Launch 3D Slicer.
 
 3.Open Edit → Application Settings → Modules.
