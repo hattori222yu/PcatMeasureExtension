@@ -2,7 +2,7 @@
 name = PcatMeasureExtension
 version = 0.1.0
 description = Pericoronary Adipose Tissue (PCAT) measurement and coronary centerline-based cross-sectional analysis for research use.
-iconURL =
+iconURL = https://raw.githubusercontent.com/hattori222yu/PcatMeasureExtension/main/Docs/icon.png
 screenshotURLs =
 
 [metadata]
