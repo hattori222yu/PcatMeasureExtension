@@ -36,11 +36,6 @@ import vtk.util.numpy_support
 import slicer
 from slicer.ScriptedLoadableModule import *
 
-#module_dir = os.path.dirname(os.path.abspath(__file__))
-#utils_dir = os.path.join(module_dir, "utils")
-#if utils_dir not in sys.path:
-#    sys.path.insert(0, utils_dir)
-
 from utils.branch import showMultiCheckPopup
 from utils.cal_startpoint import cal_start_point
 from utils.save_overlay import exportSegToLabel
@@ -86,16 +81,10 @@ class PcatMeasureWidget(ScriptedLoadableModuleWidget):
         ScriptedLoadableModuleWidget.setup(self)
         if not hasattr(self, "logic"):
             self.logic = PcatMeasureLogic()
-        #self.logic = PcatMeasureLogic()
 
         self.extractLogic = ExtractCenterlineLogic()
         self.resetWidgetState()
         self.layout = qt.QVBoxLayout()
-        
-        
-        
-        
-        
         
         # title
         titleLabel = qt.QLabel("Pcat measure")
@@ -111,14 +100,12 @@ class PcatMeasureWidget(ScriptedLoadableModuleWidget):
         self.layout.addWidget(self.segPathLabel)
 
         # button
-        self.loadCTButton2 = qt.QPushButton("[1] : Get CT Node")
+        self.loadCTButton = qt.QPushButton("[1] : Get CT Node")
         self.addPointButton = qt.QPushButton("Manual starting Point")
-        self.loadSegButton2 = qt.QPushButton("Load Seg (file dialog)")
-        self.loadSegButton3 = qt.QPushButton("[2]:Select branches")
-        self.loadSegButton4 = qt.QPushButton("[3]:Analysis PCAT")
+        self.selectbranchesButton = qt.QPushButton("[2]:Select branches")
+        self.analysypcatButton = qt.QPushButton("[3]:Analysis PCAT")
         self.clearButton = qt.QPushButton("Clear All")
         self.clearButton2 = qt.QPushButton("Clear (except CT)")
-        #self.clearButton3 = qt.QPushButton("Clear (except CT and Seg)")
         self.resetViewButton = qt.QPushButton("Reset slice views")
         self.backButton = qt.QPushButton("Back to Coronary Centerline Cross Section")
         self.showInflammationButton = qt.QPushButton("Show PCAT inflammation")
@@ -127,22 +114,18 @@ class PcatMeasureWidget(ScriptedLoadableModuleWidget):
         self.saveOverlayCheckBox = qt.QCheckBox("Save Overlay Images")
         self.saveOverlayCheckBox.checked = False
         
-        #self.loadCheckBox = qt.QCheckBox("Scene(True) or dialog(False)")
-        #self.loadCheckBox.checked = True
+        #radio
         self.sceneRadioButton = qt.QRadioButton("Scene")
         self.dialogRadioButton = qt.QRadioButton("Dialog") 
-        # Default
         self.sceneRadioButton.checked = True
         
         self.singleRadio = qt.QRadioButton("Single")
         self.branchRadio = qt.QRadioButton("Branched")
         self.singleRadio.checked = True
         
-        
         #CT Volume selector 
         ctLabel = qt.QLabel("Select CT Volume (from Scene)")
         ctLabel.setStyleSheet("font-weight: bold;")
-        
         
         self.ctSelector = slicer.qMRMLNodeComboBox()
         self.ctSelector.nodeTypes = ["vtkMRMLScalarVolumeNode"]
@@ -152,18 +135,16 @@ class PcatMeasureWidget(ScriptedLoadableModuleWidget):
         self.ctSelector.noneEnabled = True
         self.ctSelector.setMRMLScene(slicer.mrmlScene)
         
-                        
         #segmentation selector
         segLabel = qt.QLabel("Select Segmentation (from Scene)")
         segLabel.setStyleSheet("font-weight: bold;")
         
-        # --- get segment name from Segmentation ---
+        #get segment name from Segmentation
         self.segmentSelector = slicer.qMRMLSegmentSelectorWidget()
         self.segmentSelector.setMRMLScene(slicer.mrmlScene)
         self.segmentSelector.setToolTip("Select segment to process")
               
-        
-        # --- Coronary artery selection ---
+        #Coronary artery selection
         arteryLabel = qt.QLabel("Target coronary artery")
         arteryLabel.setStyleSheet("font-weight: bold;")
         
@@ -171,7 +152,6 @@ class PcatMeasureWidget(ScriptedLoadableModuleWidget):
         self.rcaRadio = qt.QRadioButton("RCA")
         self.ladRadio = qt.QRadioButton("LAD")
         self.LcxRadio = qt.QRadioButton("LCX")
-        # default
         self.rcaRadio.setChecked(True)
         
         # ButtonGroup（）
@@ -179,8 +159,6 @@ class PcatMeasureWidget(ScriptedLoadableModuleWidget):
         self.arteryButtonGroup.addButton(self.rcaRadio)
         self.arteryButtonGroup.addButton(self.ladRadio)
         self.arteryButtonGroup.addButton(self.LcxRadio)
-        
-        
         
         # pcat range start mm slider
         self.startSlider = slicer.qMRMLSliderWidget()
@@ -198,7 +176,7 @@ class PcatMeasureWidget(ScriptedLoadableModuleWidget):
         self.endSlider.decimals = 1
         self.endSlider.valueChanged.connect(self.onEndSliderChanged)
                 
-        # range sliderのdefault値を設定
+        # range default
         self.setDefaultPCATRange()
         
         # rayout
@@ -210,7 +188,6 @@ class PcatMeasureWidget(ScriptedLoadableModuleWidget):
         
         label = qt.QLabel("Load data from")
         label.setStyleSheet("font-weight: bold;")
-        #formLayout.addRow(label, self.loadCheckBox)
         self.loadButtonGroup = qt.QButtonGroup()
         self.loadButtonGroup.addButton(self.sceneRadioButton)
         self.loadButtonGroup.addButton(self.dialogRadioButton)
@@ -231,7 +208,7 @@ class PcatMeasureWidget(ScriptedLoadableModuleWidget):
         radioLayout.addStretch(1)
         formLayout.addRow(label, radioLayout)
         
-        # --- Target coronary artery (GroupBox) ---
+        #Target coronary artery (GroupBox)
         arteryWidget = qt.QWidget()
         arteryLayout = qt.QHBoxLayout(arteryWidget)
         arteryLayout.setContentsMargins(0, 0, 0, 8)
@@ -255,7 +232,7 @@ class PcatMeasureWidget(ScriptedLoadableModuleWidget):
         
         label = qt.QLabel("")
         label.setStyleSheet("font-weight: bold;")
-        formLayout.addRow(label, self.loadCTButton2)
+        formLayout.addRow(label, self.loadCTButton)
 
         
            
@@ -268,11 +245,11 @@ class PcatMeasureWidget(ScriptedLoadableModuleWidget):
         
         label = qt.QLabel("")
         label.setStyleSheet("font-weight: bold;")
-        formLayout.addRow(label, self.loadSegButton3)
+        formLayout.addRow(label, self.selectbranchesButton)
         
         label = qt.QLabel("")
         label.setStyleSheet("font-weight: bold;")
-        formLayout.addRow(label, self.loadSegButton4)
+        formLayout.addRow(label, self.analysypcatButton)
         formLayout.addItem(qt.QSpacerItem(0, 16, qt.QSizePolicy.Minimum, qt.QSizePolicy.Fixed))
         
         label = qt.QLabel("Option")
@@ -289,17 +266,14 @@ class PcatMeasureWidget(ScriptedLoadableModuleWidget):
 
         self.layout.addLayout(formLayout)
 
-        
-        
         # connect signal
-        self.loadCTButton2.connect("clicked(bool)", self.onLoadCT)
-        self.loadSegButton3.connect("clicked(bool)", self.onSelect_branches)
-        self.loadSegButton4.connect("clicked(bool)", self.onAnalysys_pcat)
+        self.loadCTButton.connect("clicked(bool)", self.onLoadCT)
+        self.selectbranchesButton.connect("clicked(bool)", self.onSelect_branches)
+        self.analysypcatButton.connect("clicked(bool)", self.onAnalysys_pcat)
         self.resetViewButton.connect("clicked()",self.onResetViewButtonClicked)
         self.addPointButton.connect("clicked(bool)", self.onEnableMarkups)
         self.clearButton.clicked.connect(self.onClearAllNodes)
         self.clearButton2.clicked.connect(self.onClearNodes_except_CT)
-        #self.clearButton3.clicked.connect(self.onClearcenterlineNodes)
         self.rcaRadio.toggled.connect(self.onArteryChanged)
         self.ladRadio.toggled.connect(self.onArteryChanged)
         self.LcxRadio.toggled.connect(self.onArteryChanged)
@@ -336,13 +310,10 @@ class PcatMeasureWidget(ScriptedLoadableModuleWidget):
         self.selected_ids = []
         self.textActors = []
         
-        #self.observerTag = None
-        
     def setCaseNodeIDs(self, nodeIDs,nodeIDs_2):
         self.caseNodeIDs = list(nodeIDs)
         self.caseNodeIDs_2 = list(nodeIDs_2)   
    
-
     def clearCaseNodes(self,caseNodeIDs, keepNodeIDs=None):
     
         keepNodeIDs = set(keepNodeIDs or [])
@@ -414,8 +385,7 @@ class PcatMeasureWidget(ScriptedLoadableModuleWidget):
             self.keepIDs.append(self.ctNode.GetID())
 
             logging.info("--Loaded CT")
-            
-            
+               
     
 #%%   radio button
     def onArteryChanged(self):
@@ -456,12 +426,14 @@ class PcatMeasureWidget(ScriptedLoadableModuleWidget):
         if self.end_mm < self.start_mm:
             self.start_mm = self.end_mm
             self.startSlider.value = self.start_mm
+            
 #%%    #view reset button
     def onResetViewButtonClicked(self):
         lm = slicer.app.layoutManager()
         lm.sliceWidget("Red").sliceLogic().GetSliceNode().SetOrientationToAxial()
         lm.sliceWidget("Green").sliceLogic().GetSliceNode().SetOrientationToCoronal()
         lm.sliceWidget("Yellow").sliceLogic().GetSliceNode().SetOrientationToSagittal()
+        
 #%%    #goto cccs module   
     def onBackButtonClicked(self):
         ###slicer.util.reloadScriptedModule("CoronaryCenterlineCrossSection")  this is forced
@@ -485,6 +457,7 @@ class PcatMeasureWidget(ScriptedLoadableModuleWidget):
 
         # Specify Markups as the placement target
         slicer.modules.markups.logic().SetActiveListID(markupsNode)
+        
 #%% Clear node
     def onClearAllNodes(self):
         slicer.mrmlScene.Clear(0)
@@ -493,9 +466,7 @@ class PcatMeasureWidget(ScriptedLoadableModuleWidget):
     def onClearNodes_except_CT(self):
         self.clearCaseNodes(caseNodeIDs=self.caseNodeIDs_2,keepNodeIDs=self.keepIDs)
         logging.info("All nodes except the CT have been cleared.")    
-    
-    
-        
+
 #%% inflammatino2jpeg
     def onShowInflammation(self):
         volumeNode = self.ctNode
@@ -536,7 +507,6 @@ class PcatMeasureWidget(ScriptedLoadableModuleWidget):
     
         slicer.util.infoDisplay("PCAT-colored CT image created and displayed.")
      
-    
 #%%
     def BranchSelectionAccepted(self, selected_ids, total_selected_length):
         self.selected_ids = selected_ids
@@ -784,6 +754,70 @@ class PcatMeasureWidget(ScriptedLoadableModuleWidget):
             total_lengths.append(total_length)
         
         
+        
+        if self.singleRadio.checked:
+            if self.coronary_artery_name == "RCA":
+                cumulative_length = 0
+                for i in range(len(total_lengths)):
+                    cumulative_length += total_lengths[i]
+                    self.default_branch_id.append(i)
+                    if cumulative_length >= 50:
+                        break
+            elif self.coronary_artery_name=="LAD":
+                
+                cumulative_length = 0
+                for i in range(len(total_lengths)):
+                    cumulative_length += total_lengths[i]
+                    self.default_branch_id.append(i)
+                    if cumulative_length >= 50:
+                        break
+            elif self.coronary_artery_name=="LCX":
+                cumulative_length = 0
+                for i in range(len(total_lengths)):
+                    cumulative_length += total_lengths[i]
+                    self.default_branch_id.append(i)
+                    if cumulative_length >= 50:
+                        break
+        else:
+            if len(total_lengths)>1:
+            
+                if self.coronary_artery_name in ("LAD", "LCX"):
+                    bifurcation_ids = self.logic.find_first_bifurcation(mergedCenterlines=self.mergedCenterlines,
+                                                                        coord_mm=self.coord_mm,
+                                                                        tol=1.0)
+                    if len(bifurcation_ids) < 2:
+                        raise RuntimeError("LM bifurcation not found")
+                    
+                    lcx_root, lad_root = self.loigc.classify_LAD_LCX(branch_ids=bifurcation_ids,
+                                                                     coord_mm=self.coord_mm)
+                    
+                if self.coronary_artery_name == "RCA":
+                    cumulative_length = 0
+                    for i in range(len(total_lengths)):
+                        cumulative_length += total_lengths[i]
+                        self.default_branch_id.append(i)
+                        if cumulative_length >= 50:
+                            break
+                elif self.coronary_artery_name=="LAD":
+                    
+                    self.default_branch_id = self.collect_until_length(lad_root,
+                                                                       mergedCenterlines=self.mergedCenterlines,
+                                                                       coord_mm=self.coord_mm,
+                                                                       target_len=40.0,
+                                                                       angle_th=np.deg2rad(30))
+                elif self.coronary_artery_name=="LCX":
+                    self.default_branch_id = self.collect_until_length(lcx_root, 
+                                                                       mergedCenterlines=self.mergedCenterlines,
+                                                                       coord_mm=self.coord_mm,
+                                                                       target_len=40.0,
+                                                                       angle_th=np.deg2rad(30))
+                #branch_id is the ID corresponding to the automatically selected PCAT area
+            else:
+                
+                cumulative_length = 0
+                for i in range(len(total_lengths)):
+                    cumulative_length += total_lengths[i]
+                    self.default_branch_id.append(i)
         #In the case of multiple branches or segmentation of LCA → LAD, LCX branches, some automatic judgment is performed.
         """
         if len(total_lengths)>1:
@@ -825,31 +859,7 @@ class PcatMeasureWidget(ScriptedLoadableModuleWidget):
             for i in range(len(total_lengths)):
                 cumulative_length += total_lengths[i]
                 self.default_branch_id.append(i)
-        """       
-        
-        if self.coronary_artery_name == "RCA":
-            cumulative_length = 0
-            for i in range(len(total_lengths)):
-                cumulative_length += total_lengths[i]
-                self.default_branch_id.append(i)
-                if cumulative_length >= 50:
-                    break
-        elif self.coronary_artery_name=="LAD":
-            
-            cumulative_length = 0
-            for i in range(len(total_lengths)):
-                cumulative_length += total_lengths[i]
-                self.default_branch_id.append(i)
-                if cumulative_length >= 50:
-                    break
-        elif self.coronary_artery_name=="LCX":
-            cumulative_length = 0
-            for i in range(len(total_lengths)):
-                cumulative_length += total_lengths[i]
-                self.default_branch_id.append(i)
-                if cumulative_length >= 50:
-                    break
-        
+        """                   
         logging.info("--get branch ID is %s",self.default_branch_id)
         
         
@@ -1305,10 +1315,10 @@ class PcatMeasureLogic(ScriptedLoadableModuleLogic):
         pass
         
     def hu_to_color(self, hu):
-        """
-        HU is normalized to 0 to 1 in the range of -190 to -30,
-        and linearly interpolated between #00f5d4 (low) and #fee440 (high) using that value.
-        """
+        
+        #HU is normalized to 0 to 1 in the range of -190 to -30,
+        #and linearly interpolated between #00f5d4 (low) and #fee440 (high) using that value.
+        
 
         # Normalize HU to 0 to 1
         hu_min = -190.0
@@ -1392,14 +1402,15 @@ class PcatMeasureLogic(ScriptedLoadableModuleLogic):
     def closest_point(self,points, ref):
         ref = np.array(ref)
         return min(points, key=lambda p: np.linalg.norm(np.array(p) - ref))  
+    
     def sanitize_filename(self,name):
         return re.sub(r'[\\/:*?"<>|]', '_', name)
     
     def rasToIjkPoints(self,volumeNode, rasPoints):
-        """
-        rasPoints: (N,3) numpy array in RAS
-        return: (N,3) numpy array in IJK (float)
-        """
+        
+        #rasPoints: (N,3) numpy array in RAS
+        #return: (N,3) numpy array in IJK (float)
+        
         rasToIjk = vtk.vtkMatrix4x4()
         volumeNode.GetRASToIJKMatrix(rasToIjk)
     
@@ -1410,6 +1421,7 @@ class PcatMeasureLogic(ScriptedLoadableModuleLogic):
             ijkPoints[i] = ijk_h[:3]
 
         return ijkPoints
+    
     #%% PCAT and artery segmentation calulation method
     def setupSegmentEditor(self,mergedSeg, ctNode):
         segmentEditorNode = slicer.mrmlScene.AddNewNodeByClass(
@@ -1423,6 +1435,7 @@ class PcatMeasureLogic(ScriptedLoadableModuleLogic):
         segmentEditorWidget.setMRMLSegmentEditorNode(segmentEditorNode)
     
         return segmentEditorNode, segmentEditorWidget
+    
     def cloneSegmentation(self,sourceSeg, newName,referenceVolume):
         newSeg = slicer.mrmlScene.AddNewNodeByClass(
             "vtkMRMLSegmentationNode", newName
@@ -1476,9 +1489,9 @@ class PcatMeasureLogic(ScriptedLoadableModuleLogic):
         slicer.mrmlScene.RemoveNode(segmentEditorNode)
         
     def find_first_bifurcation(self, mergedCenterlines, coord_mm, tol):
-        """
-        最初の分岐点に属する branch ID のリストを返す
-        """
+        
+        #Returns a list of branch IDs that belong to the first branch
+        
         start_points = []
         for i in range(mergedCenterlines.GetNumberOfCells()):
             start_points.append(coord_mm[i][0])
@@ -1504,10 +1517,9 @@ class PcatMeasureLogic(ScriptedLoadableModuleLogic):
         return []
     
     def classify_LAD_LCX(self, branch_ids,coord_mm):
-    
-        """
-        Determine LAD/LCX from branch ID immediately after LM bifurcation 
-        """
+           
+        #Determine LAD/LCX from branch ID immediately after LM bifurcation 
+        
         scores = {}
          
         for bid in branch_ids:
@@ -1536,9 +1548,9 @@ class PcatMeasureLogic(ScriptedLoadableModuleLogic):
         return lad_id, lcx_id
     
     def collect_until_length(self, start_id,coord_mm, mergedCenterlines,target_len=40.0, angle_th=np.deg2rad(30)):
-        """
-        In the case of LAD and LCX, search for bifurcation and assign numbers automatically to some extent
-        """
+        
+        #In the case of LAD and LCX, search for bifurcation and assign numbers automatically to some extent
+        
         collected = [start_id]
         cum_len = 0.0
     
