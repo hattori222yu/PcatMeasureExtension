@@ -90,40 +90,40 @@ is separated into left and right coronary arteries.
 If you have coronary artery segmentation obtained by deep learning, etc., you can measure PCAT using only this module. In that case, please use the "Manual starting point" button in the options to set the origin of the coronary artery on the coronary CT image or the starting point of the analysis.
 
 
-1. **Load data from** 
+1. **Load data from**  
    Select the data source using the checkbox.  
-   By default, data are loaded from the current Scene. 
+   By default, data are loaded from the current Scene.  
    If unchecked, a file dialog will open to load data from disk.
 
-2. **Segment data** 
-   Please select whether the segmentation data you are analyzing has branches.
-   If it comes from the CoronaryCenterlineCrossSection module, Single is OK. 
+2. **Segment data**  
+   Please select whether the segmentation data you are analyzing has branches.  
+   If it comes from the CoronaryCenterlineCrossSection module, Single is OK.  
    If you have branched segmentation, please select Branched.
 
-3. **Target coronary artery** 
+3. **Target coronary artery**  
    Select the coronary branch to be analyzed.
 
-4. **Select CT Volume** and **Select Segmentation** 
+4. **Select CT Volume** and **Select Segmentation**  
    Select the CT volume and the coronary artery segmentation.  
-   If this module is opened using the **Go to PCAT** button from
+   If this module is opened using the **Go to PCAT** button from  
    *CoronaryCenterlineCrossSection*, these fields are automatically populated.
 
 5. Click **[1] Get CT Node**.
 
-6. If necessary, use the slider to define the **PCAT range**.
+6. If necessary, use the slider to define the **PCAT range**.  
    Default ranges are:
    - **RCA**: 10.0–50.0 mm  
    - **LAD / LCX**: 0.0–40.0 mm
 
 7. Click **[2] Select branches** to extract a high-precision coronary centerline.  
    The checked branch will be used for analysis.  
-   If multiple branches are present, select the branch ID corresponding to
-   the target vessel and confirm that the extracted centerline length is
+   If multiple branches are present, select the branch ID corresponding to  
+   the target vessel and confirm that the extracted centerline length is  
    sufficient for analysis.
 
-8. Click **[3] Analysis PCAT** to generate the PCAT region segmentation
+8. Click **[3] Analysis PCAT** to generate the PCAT region segmentation  
    and perform PCAT analysis.  
-   The PCAT values are displayed in the Python Interactor and saved as a `.csv`
+   The PCAT values are displayed in the Python Interactor and saved as a `.csv`  
    file in the output directory.
 
 #### Options
