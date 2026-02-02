@@ -145,11 +145,11 @@ If you have coronary artery segmentation obtained by deep learning, etc., you ca
   Returns to the *CoronaryCenterlineCrossSection* module to start a new analysis.
 
 ## Screenshots
-![Coronary Centerline GUI](Docs/CoronaryCenterlineCrossSection_GUI.png)
-![Coronary segmentation](Docs/CoronaryCenterlineCrossSection_seg.png)
+![Coronary Centerline GUI](CoronaryCenterlineCrossSection_GUI.png)
+![Coronary segmentation](CoronaryCenterlineCrossSection_seg.png)
 
-![PcatMeasure GUI](Docs/PcatMeasure_GUI.png)
-![PCAT measurement](Docs/PcatMeasure_colormap.png)
+![PcatMeasure GUI](PcatMeasure_GUI.png)
+![PCAT measurement](PcatMeasure_colormap.png)
 
 ## Known Limitations
 
